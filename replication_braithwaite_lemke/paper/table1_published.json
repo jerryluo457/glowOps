@@ -1,0 +1,554 @@
+{
+ "reciprocated": {
+  "select:Contiguity": [
+   1.06,
+   "***",
+   0.07
+  ],
+  "select:Rivalry": [
+   0.8,
+   "***",
+   0.09
+  ],
+  "select:Both Minors": [
+   -0.71,
+   "***",
+   0.05
+  ],
+  "select:Joint Democracy": [
+   -0.21,
+   "***",
+   0.05
+  ],
+  "select:Joint Satisfaction": [
+   -0.001,
+   "",
+   0.06
+  ],
+  "select:Territorial Claim": [
+   0.5,
+   "***",
+   0.08
+  ],
+  "select:Power Preponderance": [
+   -0.27,
+   "*",
+   0.16
+  ],
+  "select:Allied": [
+   -0.003,
+   "",
+   0.07
+  ],
+  "select:Peace Years": [
+   -0.03,
+   "***",
+   0.003
+  ],
+  "select:_cons": [
+   -2.05,
+   "***",
+   null
+  ],
+  "outcome:Joint Democracy": [
+   0.01,
+   "",
+   0.13
+  ],
+  "outcome:Territorial Dispute": [
+   0.61,
+   "***",
+   0.11
+  ],
+  "outcome:Joint Satisfaction": [
+   -0.21,
+   "*",
+   0.14
+  ],
+  "outcome:Power Preponderance": [
+   -0.26,
+   "",
+   0.28
+  ],
+  "outcome:Allied": [
+   0.04,
+   "",
+   0.13
+  ],
+  "outcome:_cons": [
+   0.72,
+   "***",
+   null
+  ],
+  "rho": [
+   -0.33,
+   "***"
+  ],
+  "chi2": [
+   35.97,
+   "***"
+  ],
+  "N1": 499145,
+  "N2": 1352
+ },
+ "use_force": {
+  "select:Contiguity": [
+   1.06,
+   "***",
+   0.07
+  ],
+  "select:Rivalry": [
+   0.8,
+   "***",
+   0.09
+  ],
+  "select:Both Minors": [
+   -0.71,
+   "***",
+   0.05
+  ],
+  "select:Joint Democracy": [
+   -0.21,
+   "***",
+   0.05
+  ],
+  "select:Joint Satisfaction": [
+   -0.003,
+   "",
+   0.06
+  ],
+  "select:Territorial Claim": [
+   0.51,
+   "***",
+   0.08
+  ],
+  "select:Power Preponderance": [
+   -0.29,
+   "*",
+   0.16
+  ],
+  "select:Allied": [
+   -0.003,
+   "",
+   0.07
+  ],
+  "select:Peace Years": [
+   -0.03,
+   "***",
+   0.003
+  ],
+  "select:_cons": [
+   -2.04,
+   "***",
+   null
+  ],
+  "outcome:Joint Democracy": [
+   -0.06,
+   "",
+   0.14
+  ],
+  "outcome:Territorial Dispute": [
+   -0.13,
+   "",
+   0.1
+  ],
+  "outcome:Joint Satisfaction": [
+   -0.26,
+   "*",
+   0.14
+  ],
+  "outcome:Power Preponderance": [
+   -0.04,
+   "",
+   0.3
+  ],
+  "outcome:Allied": [
+   -0.04,
+   "",
+   0.13
+  ],
+  "outcome:_cons": [
+   0.73,
+   "***",
+   null
+  ],
+  "rho": [
+   0.07,
+   ""
+  ],
+  "chi2": [
+   9.32,
+   "*"
+  ],
+  "N1": 499145,
+  "N2": 1352
+ },
+ "mutual_force": {
+  "select:Contiguity": [
+   1.06,
+   "***",
+   0.07
+  ],
+  "select:Rivalry": [
+   0.8,
+   "***",
+   0.09
+  ],
+  "select:Both Minors": [
+   -0.7,
+   "***",
+   0.05
+  ],
+  "select:Joint Democracy": [
+   -0.21,
+   "***",
+   0.05
+  ],
+  "select:Joint Satisfaction": [
+   -0.001,
+   "",
+   0.06
+  ],
+  "select:Territorial Claim": [
+   0.5,
+   "***",
+   0.08
+  ],
+  "select:Power Preponderance": [
+   -0.27,
+   "*",
+   0.16
+  ],
+  "select:Allied": [
+   -0.004,
+   "",
+   0.07
+  ],
+  "select:Peace Years": [
+   -0.03,
+   "***",
+   0.003
+  ],
+  "select:_cons": [
+   -2.07,
+   "***",
+   null
+  ],
+  "outcome:Joint Democracy": [
+   0.25,
+   "*",
+   0.13
+  ],
+  "outcome:Territorial Dispute": [
+   0.5,
+   "***",
+   0.11
+  ],
+  "outcome:Joint Satisfaction": [
+   -0.36,
+   "**",
+   0.15
+  ],
+  "outcome:Power Preponderance": [
+   -0.04,
+   "",
+   0.32
+  ],
+  "outcome:Allied": [
+   0.07,
+   "",
+   0.13
+  ],
+  "outcome:_cons": [
+   0.06,
+   "",
+   null
+  ],
+  "rho": [
+   -0.3,
+   "***"
+  ],
+  "chi2": [
+   28.32,
+   "***"
+  ],
+  "N1": 499145,
+  "N2": 1352
+ },
+ "fatal_any": {
+  "select:Contiguity": [
+   1.06,
+   "***",
+   0.07
+  ],
+  "select:Rivalry": [
+   0.8,
+   "***",
+   0.09
+  ],
+  "select:Both Minors": [
+   -0.71,
+   "***",
+   0.05
+  ],
+  "select:Joint Democracy": [
+   -0.21,
+   "***",
+   0.05
+  ],
+  "select:Joint Satisfaction": [
+   -0.001,
+   "",
+   0.06
+  ],
+  "select:Territorial Claim": [
+   0.5,
+   "***",
+   0.08
+  ],
+  "select:Power Preponderance": [
+   -0.27,
+   "*",
+   0.16
+  ],
+  "select:Allied": [
+   -0.004,
+   "",
+   0.07
+  ],
+  "select:Peace Years": [
+   -0.03,
+   "***",
+   0.003
+  ],
+  "select:_cons": [
+   -2.06,
+   "***",
+   null
+  ],
+  "outcome:Joint Democracy": [
+   0.17,
+   "",
+   0.13
+  ],
+  "outcome:Territorial Dispute": [
+   0.46,
+   "***",
+   0.11
+  ],
+  "outcome:Joint Satisfaction": [
+   -0.58,
+   "***",
+   0.15
+  ],
+  "outcome:Power Preponderance": [
+   0.08,
+   "",
+   0.3
+  ],
+  "outcome:Allied": [
+   0.16,
+   "",
+   0.13
+  ],
+  "outcome:_cons": [
+   -0.05,
+   "",
+   null
+  ],
+  "rho": [
+   -0.3,
+   "***"
+  ],
+  "chi2": [
+   27.3,
+   "***"
+  ],
+  "N1": 499145,
+  "N2": 1352
+ },
+ "fatal_250": {
+  "select:Contiguity": [
+   1.06,
+   "***",
+   0.07
+  ],
+  "select:Rivalry": [
+   0.79,
+   "***",
+   0.09
+  ],
+  "select:Both Minors": [
+   -0.71,
+   "***",
+   0.05
+  ],
+  "select:Joint Democracy": [
+   -0.21,
+   "***",
+   0.05
+  ],
+  "select:Joint Satisfaction": [
+   -0.003,
+   "",
+   0.06
+  ],
+  "select:Territorial Claim": [
+   0.5,
+   "***",
+   0.08
+  ],
+  "select:Power Preponderance": [
+   -0.29,
+   "*",
+   0.16
+  ],
+  "select:Allied": [
+   -0.003,
+   "",
+   0.07
+  ],
+  "select:Peace Years": [
+   -0.03,
+   "***",
+   0.003
+  ],
+  "select:_cons": [
+   -2.04,
+   "***",
+   null
+  ],
+  "outcome:Joint Democracy": [
+   0.16,
+   "",
+   0.15
+  ],
+  "outcome:Territorial Dispute": [
+   0.25,
+   "**",
+   0.13
+  ],
+  "outcome:Joint Satisfaction": [
+   -0.37,
+   "**",
+   0.16
+  ],
+  "outcome:Power Preponderance": [
+   0.63,
+   "**",
+   0.32
+  ],
+  "outcome:Allied": [
+   0.08,
+   "",
+   0.14
+  ],
+  "outcome:_cons": [
+   -1.08,
+   "***",
+   null
+  ],
+  "rho": [
+   -0.23,
+   "***"
+  ],
+  "chi2": [
+   12.18,
+   "**"
+  ],
+  "N1": 499145,
+  "N2": 1352
+ },
+ "war": {
+  "select:Contiguity": [
+   1.06,
+   "***",
+   0.07
+  ],
+  "select:Rivalry": [
+   0.79,
+   "***",
+   0.09
+  ],
+  "select:Both Minors": [
+   -0.72,
+   "***",
+   0.05
+  ],
+  "select:Joint Democracy": [
+   -0.21,
+   "***",
+   0.05
+  ],
+  "select:Joint Satisfaction": [
+   -0.004,
+   "",
+   0.06
+  ],
+  "select:Territorial Claim": [
+   0.51,
+   "***",
+   0.08
+  ],
+  "select:Power Preponderance": [
+   -0.29,
+   "*",
+   0.16
+  ],
+  "select:Allied": [
+   -0.002,
+   "",
+   0.07
+  ],
+  "select:Peace Years": [
+   -0.03,
+   "***",
+   0.003
+  ],
+  "select:_cons": [
+   -2.03,
+   "***",
+   null
+  ],
+  "outcome:Joint Democracy": [
+   0.36,
+   "**",
+   0.18
+  ],
+  "outcome:Territorial Dispute": [
+   0.44,
+   "***",
+   0.14
+  ],
+  "outcome:Joint Satisfaction": [
+   0.15,
+   "",
+   0.2
+  ],
+  "outcome:Power Preponderance": [
+   0.47,
+   "",
+   0.44
+  ],
+  "outcome:Allied": [
+   -0.33,
+   "",
+   0.23
+  ],
+  "outcome:_cons": [
+   -1.75,
+   "***",
+   null
+  ],
+  "rho": [
+   -0.26,
+   "***"
+  ],
+  "chi2": [
+   17.25,
+   "***"
+  ],
+  "N1": 499145,
+  "N2": 1352
+ }
+}

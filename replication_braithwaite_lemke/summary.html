@@ -1,0 +1,457 @@
+<title>Unpacking Escalation Replication</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~62rem) with a wider band for the coefficient small multiples. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #14171c;
+  --ink-2: #4a505a;
+  --ink-3: #6b717c;
+  --rule: #dfe2e7;
+  --rule-soft: #eceef1;
+  --rep: #2a78d6;
+  --pub: #eb6834;
+  --good: #1a7f3c;
+  --good-bg: #e6f4ea;
+  --bad: #b42318;
+  --bad-bg: #fdecea;
+  --code-bg: #eef1f5;
+  --f-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418; --surface: #1b1e23; --ink: #eef0f3; --ink-2: #b9bec7; --ink-3: #8d939d;
+    --rule: #2f343b; --rule-soft: #262a30; --rep: #3987e5; --pub: #d95926;
+    --good: #5cc883; --good-bg: #16301f; --bad: #f2867c; --bad-bg: #3a1a17; --code-bg: #23272d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418; --surface: #1b1e23; --ink: #eef0f3; --ink-2: #b9bec7; --ink-3: #8d939d;
+  --rule: #2f343b; --rule-soft: #262a30; --rep: #3987e5; --pub: #d95926;
+  --good: #5cc883; --good-bg: #16301f; --bad: #f2867c; --bad-bg: #3a1a17; --code-bg: #23272d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 1rem; line-height: 1.6;
+  padding-inline: 16px; padding-block: 2.5rem 4rem;
+}
+.wrap { max-width: 62rem; margin-inline: auto; display: grid; gap: 3.25rem; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.2; margin: 0; font-weight: 650; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.55rem; }
+h3 { font-size: 1.12rem; font-weight: 500; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--f-data); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.muted { color: var(--ink-2); }
+.small { font-size: 0.875rem; }
+code, .mono { font-family: var(--f-data); font-size: 0.86em; }
+code { background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+a { color: var(--rep); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--rep); outline-offset: 2px; }
+
+header { display: grid; gap: 1rem; }
+.cite { font-size: 0.92rem; color: var(--ink-2); }
+.cite em { font-style: italic; }
+.lede { font-size: 1.13rem; max-width: 64ch; }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--rule); }
+.stat { padding: 1rem 1rem 1.1rem; display: grid; gap: 0.25rem; align-content: start; }
+.stat + .stat { border-left: 1px solid var(--rule); }
+.stat .n { font-family: var(--f-display); font-size: 2rem; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat .n span { font-size: 1.1rem; color: var(--ink-3); font-weight: 500; }
+.stat .l { font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; }
+@media (max-width: 720px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--rule); }
+}
+
+section { display: grid; gap: 1.1rem; min-width: 0; }
+.section-head { display: grid; gap: 0.5rem; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; padding: 3px; background: var(--surface); }
+.seg button {
+  font: inherit; font-size: 0.875rem; border: 0; background: transparent; color: var(--ink-2);
+  padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.legend { display: flex; gap: 1.25rem; font-size: 0.85rem; color: var(--ink-2); flex-wrap: wrap; }
+.legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.legend svg { overflow: visible; }
+
+.chart-card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1.1rem 1rem 0.9rem; position: relative; }
+.panels { display: grid; grid-template-columns: 8.5rem repeat(5, minmax(0, 1fr)); gap: 0 0.6rem; }
+.panel-labels { display: grid; grid-template-rows: 2rem repeat(6, 2.1rem) 1.6rem; font-size: 0.8rem; color: var(--ink-2); }
+.panel-labels div { display: flex; align-items: center; }
+.panel { min-width: 0; }
+.panel h3 { font-family: var(--f-body); font-size: 0.82rem; font-weight: 600; height: 2rem; display: flex; align-items: center; color: var(--ink); }
+.panel svg { display: block; width: 100%; height: calc(6 * 2.1rem + 1.6rem); overflow: visible; }
+.panel.key h3::after { content: "key result"; margin-left: 0.5rem; font-family: var(--f-data); font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 400; }
+@media (max-width: 860px) {
+  .panels { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem 1rem; }
+  .panel-labels { display: none; }
+}
+@media (max-width: 560px) {
+  .panels { grid-template-columns: minmax(0, 1fr); }
+}
+.rowname { font-size: 11px; fill: var(--ink-2); }
+.tick { font-family: var(--f-data); font-size: 10px; fill: var(--ink-3); }
+.gridline { stroke: var(--rule-soft); stroke-width: 1; }
+.zero { stroke: var(--ink-3); stroke-width: 1; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--ink); color: var(--surface);
+  font-size: 0.8rem; line-height: 1.45; padding: 0.55rem 0.7rem; border-radius: 6px;
+  max-width: 16rem; box-shadow: 0 4px 16px rgb(0 0 0 / 0.18); z-index: 2;
+}
+.tip b { font-weight: 600; }
+.tip .k { display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%; margin-right: 0.35rem; vertical-align: 0.05em; }
+.chart-note { font-size: 0.82rem; color: var(--ink-3); margin-top: 0.6rem; }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 0.55rem 0.7rem; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--rule-soft); }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-weight: 600; color: var(--ink-2); font-size: 0.78rem; border-bottom: 1px solid var(--rule); vertical-align: bottom; }
+tbody tr:last-child td { border-bottom: 0; }
+td .rep { font-family: var(--f-data); font-size: 0.82rem; }
+td .pub { display: block; font-family: var(--f-data); font-size: 0.74rem; color: var(--ink-3); }
+td.diff { background: var(--bad-bg); }
+td.diff .flag { display: block; font-size: 0.68rem; color: var(--bad); font-weight: 600; letter-spacing: 0.02em; }
+tr.hl td { font-weight: 600; }
+tr.hl td:first-child { box-shadow: inset 3px 0 0 var(--rep); }
+.table-key { font-size: 0.82rem; color: var(--ink-3); }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+@media (max-width: 760px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.finding { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1.2rem; display: grid; gap: 0.8rem; align-content: start; min-width: 0; }
+.finding table { font-size: 0.8rem; }
+.finding th, .finding td { padding: 0.4rem 0.5rem; }
+.finding .table-scroll { border-radius: 8px; }
+pre { margin: 0; background: var(--code-bg); border-radius: 8px; padding: 0.7rem 0.85rem; overflow-x: auto; font-family: var(--f-data); font-size: 0.8rem; line-height: 1.5; }
+.neg { color: var(--bad); font-weight: 600; }
+
+.verdicts { display: grid; border-top: 1px solid var(--rule); }
+.verdict { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.4rem 1.2rem; padding-block: 1rem; border-bottom: 1px solid var(--rule); align-items: start; }
+.chip { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; justify-self: start; }
+.chip.ok { background: var(--good-bg); color: var(--good); }
+.chip.no { background: var(--bad-bg); color: var(--bad); }
+.chip svg { width: 0.85rem; height: 0.85rem; }
+.verdict p { font-size: 0.95rem; }
+.verdict strong { font-weight: 600; }
+@media (max-width: 520px) { .verdict { grid-template-columns: minmax(0, 1fr); } }
+
+dl.spec { display: grid; grid-template-columns: 12rem minmax(0, 1fr); margin: 0; border-top: 1px solid var(--rule); }
+dl.spec dt, dl.spec dd { padding-block: 0.65rem; border-bottom: 1px solid var(--rule); margin: 0; font-size: 0.9rem; }
+dl.spec dt { color: var(--ink-2); font-weight: 500; padding-right: 1rem; }
+@media (max-width: 600px) { dl.spec { grid-template-columns: minmax(0, 1fr); } dl.spec dt { border-bottom: 0; padding-bottom: 0; } }
+
+ul.limits { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.55rem; max-width: 70ch; }
+ul.limits li { font-size: 0.93rem; }
+footer { border-top: 1px solid var(--rule); padding-top: 1.25rem; display: grid; gap: 0.6rem; font-size: 0.85rem; color: var(--ink-2); }
+@media (prefers-reduced-motion: no-preference) { .seg button { transition: background 120ms, color 120ms; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Replication study · Conflict Management and Peace Science 28(2), 2011</div>
+    <h1>Unpacking Escalation, replicated</h1>
+    <p class="cite">Braithwaite, Alex, and Douglas Lemke. 2011. "Unpacking Escalation." <em>Conflict Management and Peace Science</em> 28(2): 111–123. <a href="https://doi.org/10.1177/0738894210396631" target="_blank" rel="noopener">doi:10.1177/0738894210396631</a></p>
+    <p class="lede">The article's central claim replicates. Across six ways of measuring escalation, a territorial dispute is the only covariate that consistently makes a militarized dispute more likely to escalate. It is significant in five of six models and insignificant only for Use of Force, as published. That pattern holds in all nine specifications estimated here, including one that corrects two coding errors found in the original data.</p>
+  </header>
+
+  <div class="stats" role="list">
+    <div class="stat" role="listitem"><div class="n">54<span>/54</span></div><div class="l">Onset-equation cells matching the published sign and significance</div></div>
+    <div class="stat" role="listitem"><div class="n">26<span>/30</span></div><div class="l">Escalation-equation cells matching the published sign and significance</div></div>
+    <div class="stat" role="listitem"><div class="n">5<span>/6</span></div><div class="l">Selection parameters (ρ) matching the published sign and significance</div></div>
+    <div class="stat" role="listitem"><div class="n">9<span>/9</span></div><div class="l">Specifications in which the territorial-dispute pattern holds</div></div>
+  </div>
+
+  <section aria-labelledby="s-chart">
+    <div class="section-head">
+      <h2 id="s-chart">Escalation equation, published vs. replicated</h2>
+      <p class="muted">Censored-probit coefficients from the second (escalation) stage, with 95% confidence intervals from dyad-clustered standard errors. Each row is one of the six escalation measures. Switch to the corrected coding to see which results depend on the original data errors.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Data coding">
+        <button type="button" id="btn-main" aria-pressed="true" data-spec="main">Original coding (rebuilt)</button>
+        <button type="button" id="btn-corrected" aria-pressed="false" data-spec="corrected">Corrected coding</button>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><svg width="26" height="12"><line x1="1" y1="6" x2="25" y2="6" stroke="var(--pub)" stroke-width="2" stroke-linecap="round"/><rect x="9" y="2" width="8" height="8" transform="rotate(45 13 6)" fill="var(--surface)" stroke="var(--pub)" stroke-width="2"/></svg>Published (Table 1)</span>
+        <span><svg width="26" height="12"><line x1="1" y1="6" x2="25" y2="6" stroke="var(--rep)" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="6" r="4.5" fill="var(--rep)" stroke="var(--surface)" stroke-width="1.5"/></svg>Replication</span>
+      </div>
+    </div>
+    <div class="chart-card" id="chart-card">
+      <div class="panels" id="panels"></div>
+      <div class="tip" id="tip" hidden></div>
+      <p class="chart-note">Hover or tap a row for exact values. The table below has the same numbers.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-table">
+    <div class="section-head">
+      <h2 id="s-table">Cell by cell</h2>
+      <p class="muted">Each cell shows the replicated coefficient with the published value beneath it. Stars: * p &lt; .10, ** p &lt; .05, *** p &lt; .01. Highlighted cells differ from the article in sign or significance. The table follows the coding selected above.</p>
+    </div>
+    <div class="table-scroll"><table id="cell-table"></table></div>
+    <p class="table-key" id="table-key"></p>
+  </section>
+
+  <section aria-labelledby="s-coding">
+    <div class="section-head">
+      <h2 id="s-coding">Two coding errors in the original data</h2>
+      <p class="muted">Stata treats a missing value (<code>.</code>) as larger than any number. Two of the article's variables behave exactly as if missing codes had been converted to <code>.</code> and then compared with <code>&gt;</code> or <code>&gt;=</code>.</p>
+    </div>
+    <div class="two">
+      <article class="finding">
+        <h3>Missing fatality levels counted as escalation</h3>
+        <p class="small muted">MID records fatalities as a band: code 4 is 251–500 deaths, 6 is more than 999, and −9 is missing. All 2,331 disputes in MID 3.0 contain only <strong>104</strong> with more than 250 deaths, yet the article counts <strong>294</strong> among its 1,901 bilateral disputes.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Measure</th><th>Published</th><th>Missing = 1</th><th>Missing = 0</th></tr></thead>
+          <tbody>
+            <tr><td>Fatalities &gt; 0</td><td>536 (28%)</td><td>627 (29%)</td><td>373 (17%)</td></tr>
+            <tr><td>Fatalities &gt; 250</td><td>294 (15%)</td><td>346 (16%)</td><td>92 (4%)</td></tr>
+          </tbody>
+        </table></div>
+        <pre>replace fatality = . if fatality == -9
+gen fat250 = fatality &gt; 3   // missing evaluates to 1</pre>
+      </article>
+      <article class="finding">
+        <h3>Polity special codes counted as democratic</h3>
+        <p class="small muted">The article names eight "jointly democratic" warring dyads. Four of them include a state whose Polity IV score is a special code: −66 (foreign interruption) or −88 (transition).</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Dyad</th><th>Year</th><th>Polity democ</th></tr></thead>
+          <tbody>
+            <tr><td>France–Turkey</td><td>1919</td><td>9 / <span class="neg">−66</span></td></tr>
+            <tr><td>Greece–Turkey</td><td>1919</td><td><span class="neg">−66</span> / <span class="neg">−66</span></td></tr>
+            <tr><td>Hungary–Romania</td><td>1944</td><td><span class="neg">−66</span> / <span class="neg">−88</span></td></tr>
+            <tr><td>Greece–Turkey</td><td>1974</td><td><span class="neg">−88</span> / 9</td></tr>
+          </tbody>
+        </table></div>
+        <p class="small muted">Coding these years as democratic raises the jointly democratic warring dyads in the replication sample from 3 to 7, against the article's 8.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-survive">
+    <div class="section-head">
+      <h2 id="s-survive">What survives the corrections</h2>
+    </div>
+    <div class="verdicts">
+      <div class="verdict">
+        <span class="chip ok"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Holds</span>
+        <p><strong>Territorial disputes escalate.</strong> The effect is unchanged for four measures and stronger for Fatalities &gt; 250 (0.25 → 0.58). Use of Force remains the single exception.</p>
+      </div>
+      <div class="verdict">
+        <span class="chip ok"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Holds</span>
+        <p><strong>Joint democracy raises the risk of mutual use of force.</strong> 0.24** with corrected coding, against 0.25* published.</p>
+      </div>
+      <div class="verdict">
+        <span class="chip no"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Does not hold</span>
+        <p><strong>Joint democracy raises the risk of war.</strong> Published at 0.36**. Corrected, the coefficient is −0.05 (p ≈ 0.82). The published result rests on dyads miscoded as democratic.</p>
+      </div>
+      <div class="verdict">
+        <span class="chip no"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Does not hold</span>
+        <p><strong>Joint satisfaction lowers the risk of Fatalities &gt; 250.</strong> Published at −0.37**. Corrected, the coefficient is +0.08 and insignificant.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-spec">
+    <div class="section-head">
+      <h2 id="s-spec">Specification</h2>
+      <p class="muted">Rebuilt from the article's text, using data versions current in 2011 wherever possible.</p>
+    </div>
+    <dl class="spec">
+      <dt>Unit and sample</dt><dd>Non-directed dyad-years, 1919–1995. 500,225 observations (published: 499,145).</dd>
+      <dt>Stage 1: MID onset</dt><dd>A bilateral MID begins in the dyad-year, from COW MID v3.02. "Bilateral on day one" means exactly one originator per side. 1,457 onsets (published: 1,352).</dd>
+      <dt>Stage 2: six measures</dt><dd>Reciprocated (<code>recip</code>), Use of Force (<code>hostlev ≥ 4</code>), Mutual Use of Force (each side reaches <code>hostlev ≥ 4</code>), Fatalities &gt; 0, Fatalities &gt; 250, and War (<code>hostlev = 5</code>).</dd>
+      <dt>Both stages</dt><dd>Joint democracy (Polity IV <code>democ ≥ 6</code>), joint satisfaction (positive alliance-portfolio τ-b with the UK to 1945 and the US after), power preponderance (stronger state's CINC share), and defense pact (COW Alliances v3.03).</dd>
+      <dt>Territory</dt><dd>Stage 1 uses Huth &amp; Allee territorial claims. Stage 2 uses MID revision type 1 for either originator.</dd>
+      <dt>Stage 1 only</dt><dd>Contiguity (land or ≤ 150 miles of water), strategic rivalry, and both-minor-powers. Peace years enter as a cubic polynomial.</dd>
+      <dt>Estimator</dt><dd>Censored (Heckman) probit by maximum likelihood with dyad-clustered sandwich errors, written in Python and validated on simulated data.</dd>
+    </dl>
+  </section>
+
+  <section aria-labelledby="s-limits">
+    <div class="section-head">
+      <h2 id="s-limits">Limitations</h2>
+    </div>
+    <ul class="limits">
+      <li>Stage 2 has 7.8% more disputes than published. No definition of "bilateral on day one" reproduces the article's 1,901 disputes or its 104 wars; the escalation shares still match within two percentage points.</li>
+      <li>Table 2 reproduces only in part. The baseline probabilities match (e.g., 0.508 vs. 0.48 for Reciprocated), but replicated territorial effects are about 1.5–2 times larger than published, even though the coefficients agree.</li>
+      <li>Rivalry uses the 2021 update of Thompson's strategic rivalries rather than the 2001 list. τ-b is computed here rather than taken from EUGene.</li>
+      <li>The article defines contiguity as "fewer than 125km of water," a threshold COW does not code. Alternative definitions are run as robustness checks and change nothing substantive.</li>
+      <li>The estimator was not cross-checked against Stata or R. It recovers known parameters on simulated data (|z| &lt; 1.5).</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div>Full write-up: <code>REPORT.md</code>. Reproduce everything with <code>bash run_all.sh</code> (about 15 minutes).</div>
+    <div>Data: COW MID v3.02, NMC v4.0, Direct Contiguity v3.1, Alliances v3.03, System Membership 2004.1; Polity IV (p4v2009); Huth &amp; Allee (2002); Thompson, Sakuwa &amp; Suhas (2021).</div>
+  </footer>
+</div>
+
+<script>
+const DATA = {"main":[{"dv":"reciprocated","eq":"select","v":"Contiguity","rb":1.055,"rse":0.059,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"reciprocated","eq":"select","v":"Rivalry","rb":0.808,"rse":0.08,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"reciprocated","eq":"select","v":"Both Minors","rb":-0.755,"rse":0.048,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"reciprocated","eq":"select","v":"Joint Democracy","rb":-0.161,"rse":0.056,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"reciprocated","eq":"select","v":"Joint Satisfaction","rb":0.004,"rse":0.054,"rs":"","pb":-0.001,"ps":"","pse":0.06,"m":true},{"dv":"reciprocated","eq":"select","v":"Territorial Claim","rb":0.486,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"reciprocated","eq":"select","v":"Power Preponderance","rb":-0.367,"rse":0.142,"rs":"**","pb":-0.27,"ps":"*","pse":0.16,"m":true},{"dv":"reciprocated","eq":"select","v":"Allied","rb":-0.029,"rse":0.059,"rs":"","pb":-0.003,"ps":"","pse":0.07,"m":true},{"dv":"reciprocated","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Joint Democracy","rb":0.041,"rse":0.11,"rs":"","pb":0.01,"ps":"","pse":0.13,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Territorial Dispute","rb":0.582,"rse":0.097,"rs":"***","pb":0.61,"ps":"***","pse":0.11,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Joint Satisfaction","rb":-0.204,"rse":0.139,"rs":"","pb":-0.21,"ps":"*","pse":0.14,"m":false},{"dv":"reciprocated","eq":"outcome","v":"Power Preponderance","rb":-0.244,"rse":0.271,"rs":"","pb":-0.26,"ps":"","pse":0.28,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Allied","rb":0.064,"rse":0.123,"rs":"","pb":0.04,"ps":"","pse":0.13,"m":true},{"dv":"reciprocated","eq":"rho","v":"rho","rb":-0.319,"rse":null,"rs":"***","pb":-0.33,"ps":"***","pse":null,"m":true},{"dv":"use_force","eq":"select","v":"Contiguity","rb":1.056,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"use_force","eq":"select","v":"Rivalry","rb":0.806,"rse":0.08,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"use_force","eq":"select","v":"Both Minors","rb":-0.762,"rse":0.048,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"use_force","eq":"select","v":"Joint Democracy","rb":-0.163,"rse":0.056,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"use_force","eq":"select","v":"Joint Satisfaction","rb":0.002,"rse":0.054,"rs":"","pb":-0.003,"ps":"","pse":0.06,"m":true},{"dv":"use_force","eq":"select","v":"Territorial Claim","rb":0.485,"rse":0.072,"rs":"***","pb":0.51,"ps":"***","pse":0.08,"m":true},{"dv":"use_force","eq":"select","v":"Power Preponderance","rb":-0.378,"rse":0.143,"rs":"***","pb":-0.29,"ps":"*","pse":0.16,"m":true},{"dv":"use_force","eq":"select","v":"Allied","rb":-0.029,"rse":0.06,"rs":"","pb":-0.003,"ps":"","pse":0.07,"m":true},{"dv":"use_force","eq":"select","v":"Peace Years","rb":-0.038,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"use_force","eq":"outcome","v":"Joint Democracy","rb":-0.061,"rse":0.122,"rs":"","pb":-0.06,"ps":"","pse":0.14,"m":true},{"dv":"use_force","eq":"outcome","v":"Territorial Dispute","rb":-0.08,"rse":0.095,"rs":"","pb":-0.13,"ps":"","pse":0.1,"m":true},{"dv":"use_force","eq":"outcome","v":"Joint Satisfaction","rb":-0.137,"rse":0.127,"rs":"","pb":-0.26,"ps":"*","pse":0.14,"m":false},{"dv":"use_force","eq":"outcome","v":"Power Preponderance","rb":-0.105,"rse":0.277,"rs":"","pb":-0.04,"ps":"","pse":0.3,"m":true},{"dv":"use_force","eq":"outcome","v":"Allied","rb":-0.145,"rse":0.121,"rs":"","pb":-0.04,"ps":"","pse":0.13,"m":true},{"dv":"use_force","eq":"rho","v":"rho","rb":0.113,"rse":null,"rs":"**","pb":0.07,"ps":"","pse":null,"m":false},{"dv":"mutual_force","eq":"select","v":"Contiguity","rb":1.054,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"mutual_force","eq":"select","v":"Rivalry","rb":0.809,"rse":0.079,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"mutual_force","eq":"select","v":"Both Minors","rb":-0.753,"rse":0.048,"rs":"***","pb":-0.7,"ps":"***","pse":0.05,"m":true},{"dv":"mutual_force","eq":"select","v":"Joint Democracy","rb":-0.161,"rse":0.056,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"mutual_force","eq":"select","v":"Joint Satisfaction","rb":0.004,"rse":0.054,"rs":"","pb":-0.001,"ps":"","pse":0.06,"m":true},{"dv":"mutual_force","eq":"select","v":"Territorial Claim","rb":0.49,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"mutual_force","eq":"select","v":"Power Preponderance","rb":-0.365,"rse":0.143,"rs":"**","pb":-0.27,"ps":"*","pse":0.16,"m":true},{"dv":"mutual_force","eq":"select","v":"Allied","rb":-0.028,"rse":0.059,"rs":"","pb":-0.004,"ps":"","pse":0.07,"m":true},{"dv":"mutual_force","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Joint Democracy","rb":0.223,"rse":0.11,"rs":"**","pb":0.25,"ps":"*","pse":0.13,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Territorial Dispute","rb":0.494,"rse":0.108,"rs":"***","pb":0.5,"ps":"***","pse":0.11,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Joint Satisfaction","rb":-0.338,"rse":0.141,"rs":"**","pb":-0.36,"ps":"**","pse":0.15,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Power Preponderance","rb":-0.043,"rse":0.314,"rs":"","pb":-0.04,"ps":"","pse":0.32,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Allied","rb":0.056,"rse":0.124,"rs":"","pb":0.07,"ps":"","pse":0.13,"m":true},{"dv":"mutual_force","eq":"rho","v":"rho","rb":-0.27,"rse":null,"rs":"***","pb":-0.3,"ps":"***","pse":null,"m":true},{"dv":"fatal_any","eq":"select","v":"Contiguity","rb":1.056,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"fatal_any","eq":"select","v":"Rivalry","rb":0.808,"rse":0.08,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"fatal_any","eq":"select","v":"Both Minors","rb":-0.753,"rse":0.048,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_any","eq":"select","v":"Joint Democracy","rb":-0.161,"rse":0.056,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_any","eq":"select","v":"Joint Satisfaction","rb":0.005,"rse":0.054,"rs":"","pb":-0.001,"ps":"","pse":0.06,"m":true},{"dv":"fatal_any","eq":"select","v":"Territorial Claim","rb":0.488,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"fatal_any","eq":"select","v":"Power Preponderance","rb":-0.365,"rse":0.142,"rs":"**","pb":-0.27,"ps":"*","pse":0.16,"m":true},{"dv":"fatal_any","eq":"select","v":"Allied","rb":-0.029,"rse":0.059,"rs":"","pb":-0.004,"ps":"","pse":0.07,"m":true},{"dv":"fatal_any","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Joint Democracy","rb":0.149,"rse":0.137,"rs":"","pb":0.17,"ps":"","pse":0.13,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Territorial Dispute","rb":0.465,"rse":0.11,"rs":"***","pb":0.46,"ps":"***","pse":0.11,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Joint Satisfaction","rb":-0.523,"rse":0.144,"rs":"***","pb":-0.58,"ps":"***","pse":0.15,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Power Preponderance","rb":-0.032,"rse":0.3,"rs":"","pb":0.08,"ps":"","pse":0.3,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Allied","rb":0.148,"rse":0.124,"rs":"","pb":0.16,"ps":"","pse":0.13,"m":true},{"dv":"fatal_any","eq":"rho","v":"rho","rb":-0.27,"rse":null,"rs":"***","pb":-0.3,"ps":"***","pse":null,"m":true},{"dv":"fatal_250","eq":"select","v":"Contiguity","rb":1.056,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"fatal_250","eq":"select","v":"Rivalry","rb":0.806,"rse":0.08,"rs":"***","pb":0.79,"ps":"***","pse":0.09,"m":true},{"dv":"fatal_250","eq":"select","v":"Both Minors","rb":-0.759,"rse":0.048,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_250","eq":"select","v":"Joint Democracy","rb":-0.162,"rse":0.056,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_250","eq":"select","v":"Joint Satisfaction","rb":0.004,"rse":0.054,"rs":"","pb":-0.003,"ps":"","pse":0.06,"m":true},{"dv":"fatal_250","eq":"select","v":"Territorial Claim","rb":0.485,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"fatal_250","eq":"select","v":"Power Preponderance","rb":-0.375,"rse":0.143,"rs":"***","pb":-0.29,"ps":"*","pse":0.16,"m":true},{"dv":"fatal_250","eq":"select","v":"Allied","rb":-0.029,"rse":0.059,"rs":"","pb":-0.003,"ps":"","pse":0.07,"m":true},{"dv":"fatal_250","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Joint Democracy","rb":0.034,"rse":0.146,"rs":"","pb":0.16,"ps":"","pse":0.15,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Territorial Dispute","rb":0.245,"rse":0.122,"rs":"**","pb":0.25,"ps":"**","pse":0.13,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Joint Satisfaction","rb":-0.328,"rse":0.158,"rs":"**","pb":-0.37,"ps":"**","pse":0.16,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Power Preponderance","rb":0.564,"rse":0.302,"rs":"*","pb":0.63,"ps":"**","pse":0.32,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Allied","rb":0.134,"rse":0.142,"rs":"","pb":0.08,"ps":"","pse":0.14,"m":true},{"dv":"fatal_250","eq":"rho","v":"rho","rb":-0.235,"rse":null,"rs":"***","pb":-0.23,"ps":"***","pse":null,"m":true},{"dv":"war","eq":"select","v":"Contiguity","rb":1.051,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"war","eq":"select","v":"Rivalry","rb":0.806,"rse":0.08,"rs":"***","pb":0.79,"ps":"***","pse":0.09,"m":true},{"dv":"war","eq":"select","v":"Both Minors","rb":-0.766,"rse":0.048,"rs":"***","pb":-0.72,"ps":"***","pse":0.05,"m":true},{"dv":"war","eq":"select","v":"Joint Democracy","rb":-0.163,"rse":0.056,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"war","eq":"select","v":"Joint Satisfaction","rb":0.001,"rse":0.054,"rs":"","pb":-0.004,"ps":"","pse":0.06,"m":true},{"dv":"war","eq":"select","v":"Territorial Claim","rb":0.489,"rse":0.071,"rs":"***","pb":0.51,"ps":"***","pse":0.08,"m":true},{"dv":"war","eq":"select","v":"Power Preponderance","rb":-0.385,"rse":0.143,"rs":"***","pb":-0.29,"ps":"*","pse":0.16,"m":true},{"dv":"war","eq":"select","v":"Allied","rb":-0.026,"rse":0.06,"rs":"","pb":-0.002,"ps":"","pse":0.07,"m":true},{"dv":"war","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"war","eq":"outcome","v":"Joint Democracy","rb":0.249,"rse":0.178,"rs":"","pb":0.36,"ps":"**","pse":0.18,"m":false},{"dv":"war","eq":"outcome","v":"Territorial Dispute","rb":0.501,"rse":0.167,"rs":"***","pb":0.44,"ps":"***","pse":0.14,"m":true},{"dv":"war","eq":"outcome","v":"Joint Satisfaction","rb":0.246,"rse":0.209,"rs":"","pb":0.15,"ps":"","pse":0.2,"m":true},{"dv":"war","eq":"outcome","v":"Power Preponderance","rb":0.926,"rse":0.473,"rs":"*","pb":0.47,"ps":"","pse":0.44,"m":false},{"dv":"war","eq":"outcome","v":"Allied","rb":-0.319,"rse":0.257,"rs":"","pb":-0.33,"ps":"","pse":0.23,"m":true},{"dv":"war","eq":"rho","v":"rho","rb":-0.369,"rse":null,"rs":"***","pb":-0.26,"ps":"***","pse":null,"m":true}],"corrected":[{"dv":"reciprocated","eq":"select","v":"Contiguity","rb":1.059,"rse":0.059,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"reciprocated","eq":"select","v":"Rivalry","rb":0.803,"rse":0.08,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"reciprocated","eq":"select","v":"Both Minors","rb":-0.757,"rse":0.048,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"reciprocated","eq":"select","v":"Joint Democracy","rb":-0.229,"rse":0.068,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"reciprocated","eq":"select","v":"Joint Satisfaction","rb":0.011,"rse":0.054,"rs":"","pb":-0.001,"ps":"","pse":0.06,"m":true},{"dv":"reciprocated","eq":"select","v":"Territorial Claim","rb":0.487,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"reciprocated","eq":"select","v":"Power Preponderance","rb":-0.367,"rse":0.142,"rs":"***","pb":-0.27,"ps":"*","pse":0.16,"m":true},{"dv":"reciprocated","eq":"select","v":"Allied","rb":-0.024,"rse":0.059,"rs":"","pb":-0.003,"ps":"","pse":0.07,"m":true},{"dv":"reciprocated","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Joint Democracy","rb":0.074,"rse":0.124,"rs":"","pb":0.01,"ps":"","pse":0.13,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Territorial Dispute","rb":0.582,"rse":0.097,"rs":"***","pb":0.61,"ps":"***","pse":0.11,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Joint Satisfaction","rb":-0.207,"rse":0.139,"rs":"","pb":-0.21,"ps":"*","pse":0.14,"m":false},{"dv":"reciprocated","eq":"outcome","v":"Power Preponderance","rb":-0.246,"rse":0.27,"rs":"","pb":-0.26,"ps":"","pse":0.28,"m":true},{"dv":"reciprocated","eq":"outcome","v":"Allied","rb":0.063,"rse":0.123,"rs":"","pb":0.04,"ps":"","pse":0.13,"m":true},{"dv":"reciprocated","eq":"rho","v":"rho","rb":-0.319,"rse":null,"rs":"***","pb":-0.33,"ps":"***","pse":null,"m":true},{"dv":"use_force","eq":"select","v":"Contiguity","rb":1.06,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"use_force","eq":"select","v":"Rivalry","rb":0.8,"rse":0.081,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"use_force","eq":"select","v":"Both Minors","rb":-0.765,"rse":0.048,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"use_force","eq":"select","v":"Joint Democracy","rb":-0.23,"rse":0.068,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"use_force","eq":"select","v":"Joint Satisfaction","rb":0.009,"rse":0.054,"rs":"","pb":-0.003,"ps":"","pse":0.06,"m":true},{"dv":"use_force","eq":"select","v":"Territorial Claim","rb":0.486,"rse":0.072,"rs":"***","pb":0.51,"ps":"***","pse":0.08,"m":true},{"dv":"use_force","eq":"select","v":"Power Preponderance","rb":-0.379,"rse":0.143,"rs":"***","pb":-0.29,"ps":"*","pse":0.16,"m":true},{"dv":"use_force","eq":"select","v":"Allied","rb":-0.024,"rse":0.06,"rs":"","pb":-0.003,"ps":"","pse":0.07,"m":true},{"dv":"use_force","eq":"select","v":"Peace Years","rb":-0.038,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"use_force","eq":"outcome","v":"Joint Democracy","rb":0.048,"rse":0.141,"rs":"","pb":-0.06,"ps":"","pse":0.14,"m":true},{"dv":"use_force","eq":"outcome","v":"Territorial Dispute","rb":-0.082,"rse":0.095,"rs":"","pb":-0.13,"ps":"","pse":0.1,"m":true},{"dv":"use_force","eq":"outcome","v":"Joint Satisfaction","rb":-0.151,"rse":0.127,"rs":"","pb":-0.26,"ps":"*","pse":0.14,"m":false},{"dv":"use_force","eq":"outcome","v":"Power Preponderance","rb":-0.111,"rse":0.276,"rs":"","pb":-0.04,"ps":"","pse":0.3,"m":true},{"dv":"use_force","eq":"outcome","v":"Allied","rb":-0.151,"rse":0.122,"rs":"","pb":-0.04,"ps":"","pse":0.13,"m":true},{"dv":"use_force","eq":"rho","v":"rho","rb":0.111,"rse":null,"rs":"*","pb":0.07,"ps":"","pse":null,"m":false},{"dv":"mutual_force","eq":"select","v":"Contiguity","rb":1.058,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"mutual_force","eq":"select","v":"Rivalry","rb":0.803,"rse":0.08,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"mutual_force","eq":"select","v":"Both Minors","rb":-0.755,"rse":0.048,"rs":"***","pb":-0.7,"ps":"***","pse":0.05,"m":true},{"dv":"mutual_force","eq":"select","v":"Joint Democracy","rb":-0.229,"rse":0.068,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"mutual_force","eq":"select","v":"Joint Satisfaction","rb":0.011,"rse":0.054,"rs":"","pb":-0.001,"ps":"","pse":0.06,"m":true},{"dv":"mutual_force","eq":"select","v":"Territorial Claim","rb":0.49,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"mutual_force","eq":"select","v":"Power Preponderance","rb":-0.365,"rse":0.143,"rs":"**","pb":-0.27,"ps":"*","pse":0.16,"m":true},{"dv":"mutual_force","eq":"select","v":"Allied","rb":-0.024,"rse":0.059,"rs":"","pb":-0.004,"ps":"","pse":0.07,"m":true},{"dv":"mutual_force","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Joint Democracy","rb":0.238,"rse":0.12,"rs":"**","pb":0.25,"ps":"*","pse":0.13,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Territorial Dispute","rb":0.494,"rse":0.108,"rs":"***","pb":0.5,"ps":"***","pse":0.11,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Joint Satisfaction","rb":-0.333,"rse":0.141,"rs":"**","pb":-0.36,"ps":"**","pse":0.15,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Power Preponderance","rb":-0.036,"rse":0.313,"rs":"","pb":-0.04,"ps":"","pse":0.32,"m":true},{"dv":"mutual_force","eq":"outcome","v":"Allied","rb":0.055,"rse":0.125,"rs":"","pb":0.07,"ps":"","pse":0.13,"m":true},{"dv":"mutual_force","eq":"rho","v":"rho","rb":-0.269,"rse":null,"rs":"***","pb":-0.3,"ps":"***","pse":null,"m":true},{"dv":"fatal_any","eq":"select","v":"Contiguity","rb":1.058,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"fatal_any","eq":"select","v":"Rivalry","rb":0.801,"rse":0.08,"rs":"***","pb":0.8,"ps":"***","pse":0.09,"m":true},{"dv":"fatal_any","eq":"select","v":"Both Minors","rb":-0.757,"rse":0.049,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_any","eq":"select","v":"Joint Democracy","rb":-0.229,"rse":0.068,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_any","eq":"select","v":"Joint Satisfaction","rb":0.01,"rse":0.054,"rs":"","pb":-0.001,"ps":"","pse":0.06,"m":true},{"dv":"fatal_any","eq":"select","v":"Territorial Claim","rb":0.492,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"fatal_any","eq":"select","v":"Power Preponderance","rb":-0.369,"rse":0.143,"rs":"***","pb":-0.27,"ps":"*","pse":0.16,"m":true},{"dv":"fatal_any","eq":"select","v":"Allied","rb":-0.024,"rse":0.06,"rs":"","pb":-0.004,"ps":"","pse":0.07,"m":true},{"dv":"fatal_any","eq":"select","v":"Peace Years","rb":-0.038,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Joint Democracy","rb":0.23,"rse":0.168,"rs":"","pb":0.17,"ps":"","pse":0.13,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Territorial Dispute","rb":0.541,"rse":0.112,"rs":"***","pb":0.46,"ps":"***","pse":0.11,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Joint Satisfaction","rb":-0.361,"rse":0.145,"rs":"**","pb":-0.58,"ps":"***","pse":0.15,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Power Preponderance","rb":-0.434,"rse":0.326,"rs":"","pb":0.08,"ps":"","pse":0.3,"m":true},{"dv":"fatal_any","eq":"outcome","v":"Allied","rb":0.028,"rse":0.127,"rs":"","pb":0.16,"ps":"","pse":0.13,"m":true},{"dv":"fatal_any","eq":"rho","v":"rho","rb":-0.237,"rse":null,"rs":"***","pb":-0.3,"ps":"***","pse":null,"m":true},{"dv":"fatal_250","eq":"select","v":"Contiguity","rb":1.057,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"fatal_250","eq":"select","v":"Rivalry","rb":0.802,"rse":0.08,"rs":"***","pb":0.79,"ps":"***","pse":0.09,"m":true},{"dv":"fatal_250","eq":"select","v":"Both Minors","rb":-0.763,"rse":0.049,"rs":"***","pb":-0.71,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_250","eq":"select","v":"Joint Democracy","rb":-0.23,"rse":0.068,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"fatal_250","eq":"select","v":"Joint Satisfaction","rb":0.009,"rse":0.054,"rs":"","pb":-0.003,"ps":"","pse":0.06,"m":true},{"dv":"fatal_250","eq":"select","v":"Territorial Claim","rb":0.489,"rse":0.071,"rs":"***","pb":0.5,"ps":"***","pse":0.08,"m":true},{"dv":"fatal_250","eq":"select","v":"Power Preponderance","rb":-0.377,"rse":0.143,"rs":"***","pb":-0.29,"ps":"*","pse":0.16,"m":true},{"dv":"fatal_250","eq":"select","v":"Allied","rb":-0.023,"rse":0.06,"rs":"","pb":-0.003,"ps":"","pse":0.07,"m":true},{"dv":"fatal_250","eq":"select","v":"Peace Years","rb":-0.039,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Joint Democracy","rb":0.01,"rse":0.219,"rs":"","pb":0.16,"ps":"","pse":0.15,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Territorial Dispute","rb":0.583,"rse":0.175,"rs":"***","pb":0.25,"ps":"**","pse":0.13,"m":true},{"dv":"fatal_250","eq":"outcome","v":"Joint Satisfaction","rb":0.084,"rse":0.223,"rs":"","pb":-0.37,"ps":"**","pse":0.16,"m":false},{"dv":"fatal_250","eq":"outcome","v":"Power Preponderance","rb":0.615,"rse":0.472,"rs":"","pb":0.63,"ps":"**","pse":0.32,"m":false},{"dv":"fatal_250","eq":"outcome","v":"Allied","rb":-0.105,"rse":0.252,"rs":"","pb":0.08,"ps":"","pse":0.14,"m":true},{"dv":"fatal_250","eq":"rho","v":"rho","rb":-0.383,"rse":null,"rs":"***","pb":-0.23,"ps":"***","pse":null,"m":true},{"dv":"war","eq":"select","v":"Contiguity","rb":1.054,"rse":0.06,"rs":"***","pb":1.06,"ps":"***","pse":0.07,"m":true},{"dv":"war","eq":"select","v":"Rivalry","rb":0.801,"rse":0.08,"rs":"***","pb":0.79,"ps":"***","pse":0.09,"m":true},{"dv":"war","eq":"select","v":"Both Minors","rb":-0.768,"rse":0.048,"rs":"***","pb":-0.72,"ps":"***","pse":0.05,"m":true},{"dv":"war","eq":"select","v":"Joint Democracy","rb":-0.23,"rse":0.068,"rs":"***","pb":-0.21,"ps":"***","pse":0.05,"m":true},{"dv":"war","eq":"select","v":"Joint Satisfaction","rb":0.008,"rse":0.054,"rs":"","pb":-0.004,"ps":"","pse":0.06,"m":true},{"dv":"war","eq":"select","v":"Territorial Claim","rb":0.49,"rse":0.071,"rs":"***","pb":0.51,"ps":"***","pse":0.08,"m":true},{"dv":"war","eq":"select","v":"Power Preponderance","rb":-0.385,"rse":0.143,"rs":"***","pb":-0.29,"ps":"*","pse":0.16,"m":true},{"dv":"war","eq":"select","v":"Allied","rb":-0.022,"rse":0.06,"rs":"","pb":-0.002,"ps":"","pse":0.07,"m":true},{"dv":"war","eq":"select","v":"Peace Years","rb":-0.038,"rse":0.003,"rs":"***","pb":-0.03,"ps":"***","pse":0.003,"m":true},{"dv":"war","eq":"outcome","v":"Joint Democracy","rb":-0.049,"rse":0.214,"rs":"","pb":0.36,"ps":"**","pse":0.18,"m":false},{"dv":"war","eq":"outcome","v":"Territorial Dispute","rb":0.504,"rse":0.167,"rs":"***","pb":0.44,"ps":"***","pse":0.14,"m":true},{"dv":"war","eq":"outcome","v":"Joint Satisfaction","rb":0.264,"rse":0.201,"rs":"","pb":0.15,"ps":"","pse":0.2,"m":true},{"dv":"war","eq":"outcome","v":"Power Preponderance","rb":0.967,"rse":0.471,"rs":"**","pb":0.47,"ps":"","pse":0.44,"m":false},{"dv":"war","eq":"outcome","v":"Allied","rb":-0.284,"rse":0.242,"rs":"","pb":-0.33,"ps":"","pse":0.23,"m":true},{"dv":"war","eq":"rho","v":"rho","rb":-0.368,"rse":null,"rs":"***","pb":-0.26,"ps":"***","pse":null,"m":true}]};
+const DVS = ["reciprocated", "use_force", "mutual_force", "fatal_any", "fatal_250", "war"];
+const DV_LABEL = { reciprocated: "Reciprocated", use_force: "Use of Force", mutual_force: "Mutual Use of Force",
+  fatal_any: "Fatalities > 0", fatal_250: "Fatalities > 250", war: "War" };
+const VARS = ["Territorial Dispute", "Joint Democracy", "Joint Satisfaction", "Power Preponderance", "Allied"];
+const ROW_H = 2.1 * 16, AXIS_H = 1.6 * 16;
+let spec = "main";
+
+const get = (s, dv, eq, v) => DATA[s].find(r => r.dv === dv && r.eq === eq && r.v === v);
+const fmt = x => (x < 0 ? "−" : "") + Math.abs(x).toFixed(2);
+
+// One x-domain per variable, shared by both codings so switching does not rescale the axes.
+function domain(v) {
+  let lo = 0, hi = 0;
+  for (const s of ["main", "corrected"]) for (const dv of DVS) {
+    const r = get(s, dv, "outcome", v);
+    lo = Math.min(lo, r.rb - 1.96 * r.rse, r.pb - 1.96 * r.pse);
+    hi = Math.max(hi, r.rb + 1.96 * r.rse, r.pb + 1.96 * r.pse);
+  }
+  const pad = (hi - lo) * 0.06;
+  return [lo - pad, hi + pad];
+}
+function ticks(lo, hi) {
+  const span = hi - lo, raw = span / 3, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= raw);
+  const out = [];
+  for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) out.push(+t.toFixed(6));
+  return out;
+}
+
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+const panelsEl = document.getElementById("panels");
+const tip = document.getElementById("tip");
+const card = document.getElementById("chart-card");
+const panels = [];
+
+function buildPanels() {
+  const labels = document.createElement("div");
+  labels.className = "panel-labels";
+  labels.setAttribute("aria-hidden", "true");
+  labels.innerHTML = "<div></div>" + DVS.map(d => `<div>${DV_LABEL[d]}</div>`).join("") + "<div></div>";
+  panelsEl.appendChild(labels);
+  for (const v of VARS) {
+    const wrap = document.createElement("div");
+    wrap.className = "panel" + (v === "Territorial Dispute" ? " key" : "");
+    wrap.innerHTML = `<h3>${v}</h3>`;
+    const svg = el("svg", { role: "img", "aria-label": `${v}: published and replicated coefficients for six escalation measures` }, wrap);
+    panelsEl.appendChild(wrap);
+    panels.push({ v, svg, dom: domain(v) });
+  }
+}
+
+function draw() {
+  for (const p of panels) {
+    const svg = p.svg;
+    svg.innerHTML = "";
+    const W = svg.clientWidth || 160, H = 6 * ROW_H + AXIS_H;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const narrow = window.matchMedia("(max-width: 860px)").matches;
+    const left = narrow ? 112 : 6, padX = 6;
+    const [lo, hi] = p.dom;
+    const x = t => left + (t - lo) / (hi - lo) * (W - left - padX);
+    if (narrow) DVS.forEach((dv, i) => {
+      const n = el("text", { x: 0, y: i * ROW_H + ROW_H / 2 + 4, class: "rowname" }, svg);
+      n.textContent = DV_LABEL[dv];
+    });
+    for (const t of ticks(lo, hi)) {
+      el("line", { x1: x(t), x2: x(t), y1: 0, y2: 6 * ROW_H, class: "gridline" }, svg);
+      const lab = el("text", { x: x(t), y: 6 * ROW_H + 15, "text-anchor": "middle", class: "tick" }, svg);
+      lab.textContent = fmt(t).replace(".00", "");
+    }
+    el("line", { x1: x(0), x2: x(0), y1: 0, y2: 6 * ROW_H, class: "zero" }, svg);
+    DVS.forEach((dv, i) => {
+      const r = get(spec, dv, "outcome", p.v);
+      const yc = i * ROW_H + ROW_H / 2, yp = yc - 5, yr = yc + 5;
+      const g = el("g", { tabindex: 0, role: "img",
+        "aria-label": `${DV_LABEL[dv]}: published ${fmt(r.pb)}${r.ps}, replication ${fmt(r.rb)}${r.rs}` }, svg);
+      el("rect", { x: 0, y: i * ROW_H, width: W, height: ROW_H, fill: "transparent" }, g);
+      el("line", { x1: x(r.pb - 1.96 * r.pse), x2: x(r.pb + 1.96 * r.pse), y1: yp, y2: yp,
+        stroke: "var(--pub)", "stroke-width": 2, "stroke-linecap": "round" }, g);
+      el("rect", { x: x(r.pb) - 4, y: yp - 4, width: 8, height: 8, transform: `rotate(45 ${x(r.pb)} ${yp})`,
+        fill: "var(--surface)", stroke: "var(--pub)", "stroke-width": 2 }, g);
+      el("line", { x1: x(r.rb - 1.96 * r.rse), x2: x(r.rb + 1.96 * r.rse), y1: yr, y2: yr,
+        stroke: "var(--rep)", "stroke-width": 2, "stroke-linecap": "round" }, g);
+      el("circle", { cx: x(r.rb), cy: yr, r: 4.5, fill: "var(--rep)", stroke: "var(--surface)", "stroke-width": 1.5 }, g);
+      if (!r.m) {
+        const t = el("text", { x: W - 2, y: yc + 4, "text-anchor": "end", class: "tick", fill: "var(--bad)",
+          style: "fill: var(--bad); font-weight: 600" }, g);
+        t.textContent = "≠";
+      }
+      const show = (ev) => {
+        tip.innerHTML = `<b>${p.v} · ${DV_LABEL[dv]}</b><br>` +
+          `<span class="k" style="background:var(--pub)"></span>Published ${fmt(r.pb)}${r.ps} (SE ${r.pse.toFixed(2)})<br>` +
+          `<span class="k" style="background:var(--rep)"></span>Replication ${fmt(r.rb)}${r.rs} (SE ${r.rse.toFixed(2)})` +
+          (r.m ? "" : "<br>Sign or significance differs");
+        tip.hidden = false;
+        const cr = card.getBoundingClientRect();
+        const br = g.getBoundingClientRect();
+        let left = (ev && ev.clientX ? ev.clientX : br.left + br.width / 2) - cr.left + 12;
+        const top = br.top - cr.top + br.height + 4;
+        left = Math.min(left, cr.width - tip.offsetWidth - 8);
+        tip.style.left = Math.max(8, left) + "px";
+        tip.style.top = top + "px";
+      };
+      g.addEventListener("pointermove", show);
+      g.addEventListener("focus", () => show(null));
+      g.addEventListener("pointerleave", () => { tip.hidden = true; });
+      g.addEventListener("blur", () => { tip.hidden = true; });
+    });
+  }
+}
+
+function renderTable() {
+  const t = document.getElementById("cell-table");
+  let html = "<thead><tr><th>Variable</th>" + DVS.map(d => `<th>${DV_LABEL[d]}</th>`).join("") + "</tr></thead><tbody>";
+  const rows = VARS.map(v => ["outcome", v]).concat([["rho", "rho"]]);
+  let diffs = 0, total = 0;
+  for (const [eq, v] of rows) {
+    html += `<tr${v === "Territorial Dispute" ? ' class="hl"' : ""}><td>${v === "rho" ? "ρ (selection)" : v}</td>`;
+    for (const dv of DVS) {
+      const r = get(spec, dv, eq, v);
+      total++; if (!r.m) diffs++;
+      html += `<td${r.m ? "" : ' class="diff"'}><span class="rep">${fmt(r.rb)}${r.rs}</span>` +
+        `<span class="pub">pub. ${fmt(r.pb)}${r.ps}</span>${r.m ? "" : '<span class="flag">differs</span>'}</td>`;
+    }
+    html += "</tr>";
+  }
+  t.innerHTML = html + "</tbody>";
+  document.getElementById("table-key").textContent =
+    `${total - diffs} of ${total} cells match the article under the ${spec === "main" ? "rebuilt original" : "corrected"} coding. The onset equation matches in 54 of 54 cells under both codings.`;
+}
+
+function setSpec(s) {
+  spec = s;
+  for (const b of document.querySelectorAll(".seg button")) b.setAttribute("aria-pressed", String(b.dataset.spec === s));
+  tip.hidden = true;
+  draw();
+  renderTable();
+}
+for (const b of document.querySelectorAll(".seg button")) b.addEventListener("click", () => setSpec(b.dataset.spec));
+
+buildPanels();
+setSpec("main");
+let rt;
+window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(draw, 80); });
+</script>
