@@ -1,0 +1,37 @@
+# Copyrighted article (JSTOR terms do not allow redistribution).
+# paper/table1_published.json is our own transcription and stays tracked.
+/paper/*.pdf
+/paper/paper.txt
+
+# Local tool settings
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Generated data; rebuild with `bash run_all.sh`. Uncomment to keep it out of git.
+# /data/clean/
+
+# Raw files downloaded during exploration but not used by the pipeline (~45MB).
+# Uncomment to keep the repo lean; the pipeline only needs mid302/, era2011/,
+# huth_allee/, NMC_v4_0.csv and strategic_rivalries_list.csv.
+# /data/raw/mid310/
+# /data/raw/MID_v3.10.zip
+# /data/raw/dyadic_mid_4.01/
+# /data/raw/dyadic_mid_4.01.zip
+# /data/raw/Alliance_v4.1_csv/
+# /data/raw/Alliance_v4.1_csv.zip
+# /data/raw/DirectContiguity320/
+# /data/raw/DirectContiguity320.zip
+# /data/raw/States2024/
+# /data/raw/States2024.zip
+# /data/raw/MajorPowers2024/
+# /data/raw/MajorPowers2024.zip
+# /data/raw/p5v2018.xls

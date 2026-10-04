@@ -1,0 +1,454 @@
+Huth and Allee Territorial Claims Data, 1919-1995
+
+Outcome data set 
+Data set that can be used to examine:  1) the level of concessions made by territorial dispute adversaries (in rounds of talks over disputed territory), and/or 2) the level of military
+ escalation by territorial dispute adversaries (in MIDs over disputed territory) 
+
+
+File Name:  huth_allee_outcomedata.dta
+
+
+Overview and Comments:
+
+• The purpose of this particular version of the data set is to analyze the outcomes of talks or militarized interstate disputes (MIDs) that were initiated by territorial dispute challengers (see Status Quo data).  
+• The Outcome data set includes data regarding the outcomes of 1,528 rounds of negotiations and 374 MIDs over disputed territory.  In addition, the Outcome dataset also includes an additional 4,370 observations in which no rounds of talks were launched and no MID was initiated.  These “no action” observations are included in the Outcome data set in case one wants to run a selection-type model that examines the outcomes of negotiations and MIDs, while also accounting for the challenger’s initial decision to initiate negotiations or to initiate a MID.  Because this version of the data includes data on both “terminal moves” in talks and MIDs, as well as “initial moves” to initiate/not initiate those talks and MIDs, this is the most relevant version of the data for those interested in applying game theoretic logic and strategic estimators to our data.   
+• The number of rounds of negotiations and number of MIDs is lower in the Outcome data set (1,528 rounds of negotiations and 374 MIDs) as compared to the Status Quo data set (1,782 rounds of negotiations and 390 MIDs).  This is because 254 rounds of talks and 16 MIDs were “jointly” initiated by both sides.  It makes since to include and analyze all of these “jointly initiated” cases in the Status Quo data set (see the Status Quo data set codebook for more details).  However, now that the focus shifts from the initiation of talks and MIDs to the outcomes of talks and MIDs, one of the two “duplicate” observations for the Status Quo data set is randomly deleted from the Outcome data set, in order to avoid the outcome of any given round of negotiations or MID from being analyzed twice.  
+• We generated three parallel—and very similar—versions of the Outcome data set.  Each of the three data sets represents a different “random draw” in which one of the two pairs of duplicate observations was randomly deleted for the 254 rounds of talks 16 MIDs referenced above.  
+• In order to analyze the outcomes of negotiations or the outcomes of MIDs, one must separate the observations for negotiations, as well as the observations for MIDs, from all other observations in this data set.  In order to analyze the outcomes of negotiations, one should either type “if dvsq1==1” at the end of the Stata command, or one can simply create a smaller, “negotiation” version of the larger Outcome data set by separating out all 1,528 cases of negotiations (dvsq1=1) from the broader data set.  Similarly, in order to analyze the outcomes of MIDs, one should either type “if dvsq1==2” at the end of the Stata command, or one can simply create a smaller “MID” version of the Outcome data set by separating out the 374 MIDs (dvsq1=2) from the broader data set.   
+• As was the case for the Status Quo data set, most variables in this data set are measured on a month-specific, or month-by-month basis.  
+• For each round of negotiations or MID in the Outcome data set, the independent variable data for that observation is drawn from the final month of the talks (or final month of the MID), when the ultimate decision regarding the level of concessions to make (or level of escalation to pursue) is ultimately made.  This contrasts with the data accompanying the observations in the Status Quo data set, which are taken from the initial month of any negotiations or any MID, when the negotiations or MID are first initiated.   
+• Therefore, since most rounds of negotiations and MIDs span several months, the independent variable data corresponding to a given round of talks or MID will different slightly across the Status Quo and Outcome data sets.  
+• Many of the independent variables in the Outcome data set end in “j”, “1”, or “2”.  Those variables ending in “j” are variables that apply “jointly” to both the challenger and target, such as a variable to indicate whether the challenger and target are allies.  Variables that end in “1” apply to the challenger state.  In nearly all cases, a parallel variable exists that ends in “2”, to indicate that this variable applies to the target state.  
+
+
+Variables in the Outcome Data Set
+
+challenger – COW country code for the territorial dispute challenger  
+	
+target – COW country code for the territorial dispute target
+
+edatepog  – Final month and year of the round of negotiations or MID
+	
+bdatepog – Beginning month and year of the round of negotiations or MID (same as datetm in Status Quo data)
+	
+dispno – Dispute number, by region 
+
+region – Region (Africa, the Americas, Asia, Europe, Near and Middle East)
+
+dispno2 – Dispute number, all regions
+
+chgname – Challenger country name  
+
+tgtname – Target country name 
+
+dual – Equals 1 if this is a dispute in which both states are coded as challengers (the round of negotiations or MID is only listed once in this data set, although it was listed twice in the Status Quo data set) 
+
+dupnegno – Identification number used to identify the entry that was maintained in situations where one of the two entries for a given round of negotiations was randomly deleted  (in a “dual” challenger dispute) from the Outcome data set.  
+
+dupescno – Identification number used to identify the entry that was maintained in situations where one of the two entries for a given MID was randomly deleted (in a “dual” challenger dispute) from the Outcome data set.  
+
+dvsq1 – Initial foreign policy action taken by the challenger:  0 if the challenger took no action, 1 if the challenger initiated negotiations, 2 if the challenger initiated a militarized interstate dispute.  The various dvneg variables only apply if dvsq1=1 and the various dvesc variables only apply if dvsq1=2.  
+
+dvsqngbi – Binary version of dvsq1 that can be used as the first dependent variable in a selection model intended to explain the outcome of rounds of negotiations;  0 if dvsq1 = 0 or 2, 1 if 
+dvsq1 = 1 
+
+dvsqesbi - Binary version of dvsq1 used that can be used as the first dependent variable in a selection model intended to explain the outcome of MIDs over disputed territory;  0 if dvsq1 = 0 or 1, 1 if dvsq1 = 2 
+
+dvneg1 – (if engaged in negotiations) Level of territorial concessions made by the challenger in the current round of talks (1=no concessions, 2=limited concessions, 3=major concessions)
+
+dvnegbi1 - (if engaged in negotiations) Binary version of dvneg1, which is intended to gauge whether the challenger made at least some territorial concessions in the current round of talks (0=no concessions, 1=limited or major concessions)
+
+dvneg2 – (if engaged in negotiations) Level of territorial concessions made by the target in the current round of talks (1=no concessions, 2=limited concessions, 3=major concessions)
+
+dvnegbi2 - (if engaged in negotiations) Binary version of dvneg2, which is intended to gauge whether the target made at least some territorial concessions in the current round of talks (0=no concessions, 1=limited or major concessions)
+
+dvesc1 – (if engaged in a MID) Level of military escalation by the challenger in the current MID (1=low or limited escalation, 2=moderate escalation, 3=high escalation)
+
+dvescbi1 – (if engaged in a MID) Binary version of dvesc1, which is intended to gauge whether the challenger escalated the MID to high levels of escalation (0=limited or moderate escalation, 1=high escalation)
+
+dvesc2 – (if engaged in a MID) Level of military escalation by the target in the current MID (1=low or limited escalation, 2=moderate escalation, 3=high escalation)
+
+dvescbi2 – (if engaged in a MID) Binary version of dvesc2, which is intended to gauge whether the target escalated the MID to high levels of escalation (0=limited or moderate escalation, 1=high escalation)
+
+allyj – Is there currently a defense pact or entente military alliance between the challenger and target?  0 if no, 1 if yes
+
+comoppj – Do the challenger and target currently share a common territorial dispute adversary?  0 if no, 1 if yes
+
+comadv2j – Equals 1 if the states have shared a common adversary in a militarized conflict within the past 2 years;  such conflicts include civil wars, international wars, extra systemic wars, MIDs, and MIDs in territorial disputes (NOTE:  This variable is only year-specific, not month-specific). 
+
+comadv5j - Equals 1 if the states have shared a common adversary in a militarized conflict within the past 5 years;  such conflicts include civil wars, international wars, extra systemic wars, MIDs, and MIDs in territorial disputes (NOTE:  This variable is only year-specific, not month-specific). 
+
+endriv5j – Equals 1 if the challenger and target have been involved in at least 5 militarized conflicts (MIDs, territorial dispute MIDs, ICB crises, any type of war) in the past 20 years
+
+endrv10j – Equals 1 if the challenger and target have been involved in at least 10 militarized conflicts (MIDs, territorial dispute MIDs, ICB crises, any type of war) in the past 20 years
+
+demdyadj - Equals 1 if both the challenger and target are democratic according to the Polity net-democracy measure (dem1=1 and dem2=1)  
+
+mixdyadj - Equals 1 if the challenger and target comprise a mixed dyad according the Polity net-democracy variable; that is, if either dem1=0 and dem2=1 OR dem1=1 and dem2=0
+
+autdyadj - Equals 1 if both the challenger and target are non-democratic according to the Polity net-democracy measure (dem1=0 and dem2=0)  
+
+noutdemdyad - Equals 1 if both the challenger and target are democratic according to the lagged, violence-based measure of democratic norms (nviodem1 = 1 and nviodem2 = 1)
+
+noutauthdyad - Equals 1 if both the challenger and target are non-democratic according to the lagged, violence-based measure of democratic norms (nviodem1 = 0 and nviodem2 = 0)
+
+noutmixdyad – Equals 1 if the dyad is a mixed dyad according the lagged, violence-based measures of democratic norms (nviodem1=1 and nviodem2=0 OR nviodem1=0 and nviodem2=1)
+
+dmdynpj - Equals 1 if both the challenger and target are democratic according to the lagged, Polity-based measure of democratic norms (pnvdem1 = 1 and pnvdem2 = 1)
+
+mixdynpj – Equals 1 if the dyad is a mixed dyad according the lagged, Polity-based measures of democratic norms (pnvdem1=1 and pnvdem2=0 OR pnvdem1=0 and pnvdem2=1)
+
+authdynpj - Equals 1 if both the challenger and target are non-democratic according to the lagged, Polity-based measure of democratic norms (pnvdem1 = 0 and pnvdem2 = 0)
+
+bothdw2j – Equals 1 if both the challenger and target are currently democratic (dem1=1 and dem2=1) and both have become democratic within the current calendar year or the previous two calendar years 
+
+bothdw5j – Equals 1 if both the challenger and target are currently democratic (dem1=1 and dem2=1) and both have become democratic within the current calendar year or the previous five calendar years 
+
+bothd10j – Equals 1 if both the challenger and target are currently democratic (dem1=1 and dem2=1) and both have become democratic within the current calendar year or the previous ten calendar years 
+
+bothgviol10 – Equals 1 if both the challenger and target are nondemocratic according to the lagged, violence-based measure of democratic norms (nviodem1=1 and nviodem2=1), and both had experienced internal violence in at least 10 of the past 20 years (nviol20lag1<10 and nviol20lag2<10)
+	
+authdypnd10j – Equals 1 if both the challenger and target are nondemocratic according to the lagged, Polity-based measure of democratic norms (_20dmlag1<15 and _20dmlag2<15) & both countries are very nondemocratic (netdem1 and netdem2 <=-5 for at least 10 of the past 20 years)
+
+authdypnd15j – Equals 1 if both the challenger and target are nondemocratic according to the lagged, Polity-based measure of democratic norms (_20dmlag1<15 and _20dmlag2<15) & both countries are very nondemocratic (netdem1 and netdem2 <=-5 for at least 15 of the past 20 years)
+	
+affinitj – A dummy variable equal to 1 if the challenger and target share a common regime type (if tdrgtyp1 = tdrgtuyp2);  note that affinitj = 1 only if tdrgtyp1 and tdrgtyp2 are equal to 1, 2, 3, 4 or 5
+
+affdemj – Equals 1 if affinitj=1 and both states are democratic (tdrgtyp1=1 and tdrgtyp2=1)
+
+affmonj – Equals 1 if affinitj=1 and both states are monarchies (tdrgtyp1=2 and tdrtyp2=2) 
+
+affjunj – Equals 1 if affinitj=1 and both states are military juntas (tdrgtyp1=3 and tdrgtyp2=3)
+
+affcomj – Equals 1 if affinitj=1 and both states are communist regimes (tdrgtyp1=4 and tdrgtyp2=4)
+
+chgsim3j – Equals 1 if either the challenger or target experienced a change in regime type (as classified by tdrgtyp1 or tdrgtyp2) in the past 3 years that shifted the two states from having dissimilar regime types to similar regime types 
+
+chgsim5j – Equals 1 if either the challenger or target experienced a change in regime type (as classified by tdrgtyp1 or tdrgtyp2) in the past 5 years that shifted the two states from having dissimilar regime types to similar regime types 
+
+chgsm10j – Equals 1 if either the challenger or target experienced a change in regime type (as classified by tdrgtyp1 or tdrgtyp2) in the past 10 years that shifted the two states from having dissimilar regime types to similar regime types 
+
+chgdis3j – Equals 1 if either the challenger or target experienced a change in regime type (as classified by tdrgtyp1 or tdrgtyp2) in the past 3 years that shifted the two states from having similar regime types to dissimilar regime types 
+
+chgdis5j – Equals 1 if either the challenger or target experienced a change in regime type (as classified by tdrgtyp1 or tdrgtyp2) in the past 5 years that shifted the two states from having similar regime types to dissimilar regime types 
+
+chgds10j – Equals 1 if either the challenger or target experienced a change in regime type (as classified by tdrgtyp1 or tdrgtyp2) in the past 10 years that shifted the two states from having similar regime types to dissimilar regime types 
+
+milrat1 – Military balance between challenger and target, expressed as a percentage of the overall dyadic military capabilities held by the challenger (ranges from 0-1);  this variable is an average of the two sides’ ratios of military expenditures (expratio), troops (trpratio), and spending per troop (sptrprat).
+
+locad1 – (applies to MIDs only) Equals 1 if the challenger has an advantage in the local balance of forces
+
+odi1 – Is the challenger currently engaged in another military conflict (MID, territorial dispute MID, any type of war);  0 if no, 1 if yes
+
+strval1 – Strategic value of disputed territory to the challenger;  0 if no strategic value, 1 if strategic value
+
+ecoval1 – Economic value of disputed territory to the challenger;  0 if no economic value, 1 if economic value
+
+netdem1 – POLITY net-democracy score for challenger;  ranges from –10 (most non-democratic) to +10 (most democratic)
+
+dem1 – Dummy variable to indicate that the challenger is democratic;  0 if netdem1 is less than +6, 1 if netdem1 is greater than or equal to +6
+
+ndem1 – Dummy variable to indicate that the challenger is non-democratic;  0 if netdem1 is greather than or equal to +6, 1 if netdem1 is less than +6
+
+erv5netdem1 – An interaction term generated by multiplying endriv5j * netdem1
+
+erv10netdem1 – An interaction term generated by multiplying endrv10j * netdem1
+
+erv5dem1 – An interaction term equal to 1 if endriv5j=1 and dem1=1
+
+erv10dm1 – An interaction term equal to 1 if endrv10j=1 and dem1=1
+
+stalea1 – Equals 1 if the challenger suffered a stalemate in the previous round of talks with the target and that round of talks took place within the past twelve months;  from the challenger’s point of view, a “stalemate” is when the challenger made no or limited concessions (dvneg1 in the previous talks was 0 or 1), while the target made no concessions (dvneg2 in the previous talks was 0) 
+	
+staleb1 – Equals 1 if the challenger suffered a stalemate in the previous round of talks with the target and that round of talks took place within the past twenty-four months;  from the challenger’s point of view, a “stalemate” is when the challenger made no or limited concessions (dvneg1 in the previous talks was 0 or 1), while the target made no concessions (dvneg2 in the previous talks was 0) 
+
+stalec1 – Equals 1 if the challenger suffered a stalemate in the previous round of talks with the target and that round of talks took place within the past sixty months;  from the challenger’s point of view, a “stalemate” is when the challenger made no or limited concessions (dvneg1 in the previous talks was 0 or 1), while the target made no concessions (dvneg2 in the previous talks was 0) 
+
+netdem1stale1 – An interaction term generated by multiplying netdem1 * stalea1
+
+netdem2stale1 – An interaction term generated by multiplying netdem1 * staleb1
+
+netdem5stale1 – An interaction term generated by multiplying netdem1 * stalec1 
+
+ethval1 – Does the challenger have ethnic co-nationals located in the disputed territory?  0 if no, 1 if yes
+
+netdemethval1 – An interaction term generated by multiplying ethval1 * netdem1
+
+ethvdem1 – An interaction term generated by multiplying ethval1 * dem1
+
+mil46unc1 – Indicates a situation of relative military parity between the challenger and target (milrat1 is between .4 and .6)
+
+netdemmilunc1 – An interaction term generated by multiplying netdem1 * mil46unc1
+
+tgirneg – A dummy variable equal to 1 if the target signaled an initial lack of willingness to make concessions in response to the challenger’s initiation of negotiations
+
+tgiresc – A dummy variable equal to 1 if the target signaled resolve to escalate force after the challenger initiated military action
+
+tgirnegnetdem – An interaction term generated by multiplying tgirneg by netdem1
+
+tgirescnetdem - An interaction term generated by multiplying tgiresc by netdem1
+
+tgirnegd – An interaction term generated by multiplying tgirneg by dem1
+
+tgirescd – An interaction term generated by multiplying tgiresc by dem1
+
+allupp1 – The % of seats held by the governing coalition in the upper house of bicameral challenger states (this variable only applies to democratic challengers, i.e., dem1=1); in states where the lower house has effective legislative power, the value for allow1 is used for allupp1
+
+alllow1 – The % of seats held by the governing coalition in the lower house of the challenger state (this variable only applies to democratic challengers, i.e., dem1=1) 
+leadup1 – The % of seats held by the largest/primary governing party in the upper house of bicameral challenger states (this variable only applies to democratic challengers, i.e., dem1=1); in states where the lower house has effective legislative power, the value for allow1 is used for allupp1
+
+leadlow1 - The % of seats held by the largest/primary governing party in the lower house of the challenger state (this variable only applies to democratic challengers, i.e., dem1=1)
+
+nparty1 - The number of parties in the governing coalition in the challenger state (this variable only applies to democratic challengers, i.e., dem1=1) 
+
+mingovc1 – Equals 1 if the governing coalition in the challenger state has a minority of seats (allow1<50) in the legislature (this variable only applies to democratic challengers, i.e., dem1=1) 
+
+mingovp1 – Equals 1 if the largest/primary party in the challenger state holds a minority of seats (leadlow1<50) in the legislature (this variable only applies to democratic challengers, i.e., dem1=1)
+
+majgovc1 – Equals 1 if the governing coalition in the challenger state has a majority of seats (allow1>50) in the legislature (this variable only applies to democratic challengers, i.e., dem1=1)
+
+majgovp1 – Equals 1 if the largest/primary party in the challenger state holds a majority of seats (leadlow1>50) in the legislature (this variable only applies to democratic challengers, i.e., dem1=1)
+
+elecnt1 – The number of months since the last general election was held in the challenger state (this variable only applies to democratic challengers, i.e., dem1=1)
+
+ele12m1 – Equals 1 if a general election has been held in the challenger state in the past twelve months (elecnt1<=12); also note that this variable only applies to democratic challengers, i.e., dem1=1
+
+_3intgt1 – Equals 1 if the (democratic) leader of a challenger state is in a close race within 3 months of a general election (this variable only applies to democratic challengers, i.e., dem1=1) 
+
+_6intgt1 – Equals 1 if the (democratic) leader of a challenger state is in a close race within 3 months of a general election (this variable only applies to democratic challengers, i.e., dem1=1) 
+
+ndneg1 - Equals 1 if the (non-democratic) challenger state is significantly non-democratic; that is, if netdem1 is less than or equal to 0;  (this variable only applies to non-democratic challengers, i.e., dem1=0)
+
+vndneg1 - Equals 1 if the (non-democratic) challenger state is very non-democratic; that is, if netdem1 is less than or equal to -5; (this variable only applies to non-democratic challengers, i.e., dem1=0)
+
+ncou1yr1 –  Equals 1 if the (non-democratic) challenger state has not experienced a coup within the past twelve months (this variable only applies to non-democratic challengers, i.e., dem1=0)
+
+ncou2yr1 – Equals 1 if the (non-democratic) challenger state has not experienced a coup within the past twenty-four months (this variable only applies to non-democratic challengers, i.e., dem1=0)
+
+nvrebyr1 – Equals 1 if the (non-democratic) challenger state has NOT experienced some form of violent political rebellion (vrebyr1=0) in the past calendar year (this variable only applies to non-democratic challengers, i.e., dem1=0)
+
+chnd_td1 – Equals 1 if the challenger is the non-democratic state in a mixed dyad;  that is, if dem1=0 and dem2=1
+
+nviol20lag1 - Number of the past twenty years in which the challenger state has NOT experienced violent political conflict; that is, the number of the past twenty years in which nvrebyr1=1
+
+nviodem1 - Equals 1 if the challenger is democratic according to the lagged, violence-based measure of democratic norms (nviol20lag1 is 16 or higher)
+
+_20dmlg1 – Number of the past twenty years the challenger state has been democratic (in which netdem1>=6)
+
+pnvdem1 – Equals 1 if the challenger is democratic according to the lagged, Polity-based measure of democratic norms (_20dmlag1 is 15 or higher)
+
+nv20stlyr1 - An interaction term generated by multiplying the lagged, violence-based measure of democratic norms (nviol20lag1) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 12 months (stalea1)
+
+nv20st2yr1 - An interaction term generated by multiplying the lagged, violence-based measure of democratic norms (nviol20lag1) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 24 months (staleb1)
+
+nv20st5yr1 - An interaction term generated by multiplying the lagged, violence-based measure of democratic norms (nviol20lag1) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 60 months (stalec1)
+
+nv20milad1 - Equals nviol20lag1 if milrat1 > .6666
+
+nv20milmj1 - Equals nviol20lag1 if milrat1 > .5
+
+st1dmlg1 - An interaction term generated by multiplying the lagged, Polity-based measure of democratic norms (_20dmlag1) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 12 months (stalea1)
+
+st2dmlg1 - An interaction term generated by multiplying the lagged, Polity-based measure of democratic norms (_20dmlag1) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 24 months (stalea2)
+
+st5dmlg1 - An interaction term generated by multiplying the lagged, Polity-based measure of democratic norms (_20dmlag1) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 60 months (stalea5)
+
+pnormad1 - Equals _20dmlag1 if milrat1 > .6666
+
+pnormmj1 - Equals _20dmlag1 if milrat1 > .5
+
+dem2yr1 – Equals 1 if the challenger state is currently democratic (dem1=1) and has recently become democratic (netdem1 became greater than or equal to 6) within the current calendar year or the previous two calendar years
+
+dem5yr1 – Equals 1 if the challenger state is currently democratic (dem1=1) and has recently become democratic (netdem1 became greater than or equal to 6) within the current calendar year or the previous five calendar years
+
+dem10yr1 – Equals 1 if the challenger state is currently democratic (dem1=1) and has recently become democratic (netdem1 became greater than or equal to 6) within the current calendar year or the previous ten calendar years
+
+gviol10 – Equals 1 if the challenger is nondemocratic according to the lagged, violence-based measure of democratic norms (nvioldem1=1), and had experienced internal violence in at least 10 of the past 20 years (nviol20lag1<10);  NOTE – this variable is a hold-over from a previous version of the Outcome data set
+
+yrsvnd1 – The number of the past twenty years in which the challenger has been very non-democratic;  that is, its Polity net-democracy score was –5 or less
+
+pn4_10v1 – Equals 1 if the challenger state is considered non-democratic according to the lagged, violence-based measure of democratic norms (nvioldem1=1) and if the challenger was free from internal violence for 10 or fewer years during the past twenty years (i.e., if nviol20lag1<=10)
+
+g10viol1 – Equals 1 if the challenger state is considered non-democratic according to the lagged, violence-based measure of democratic norms (nvioldem1=1) and if the challenger experienced significant internal violence during the past twenty years (i.e., if nviol20lag1<10, which means the challenger experienced internal violence in at least 10 of the past 20 years)
+
+g15viol1 – Equals 1 if the challenger state is considered non-democratic according to the lagged, violence-based measure of democratic norms (nvioldem1=1) and if the challenger experienced very high levels of internal violence during the past twenty years (i.e., if nviol20lag1<5, which means the challenger experienced internal violence in at least 15 of the past 20 years)
+
+ndnormmix1 – Equals 1 if the challenger is the nondemocratic state in a mixed dyad according to the lagged violence measure (noutmixdyad=1 and nvioldem1=0)
+
+mixdypolnondem1 - Equals 1 if the challenger is the nondemocratic state in a mixed dyad according to the lagged, Polity-based measure (mixdynpj=1 and pnvdem1=0)
+
+tdrgtyp1 – The regime type of the challenger state, based on the following classifications: 1 if democracy (netdem1 >= 6), 2 if hereditary non-democratic monarchy, 3 if collective rule by military junta, 4 if single-party-dominant communist state, 5 if single-party-dominant fascist state; 9 if other
+
+dominsec1 - Equals 1 if the regime in the challenger state is facing a domestic political threat (current civil war or revolution; insurgency, coup, or attempted coup within the past calendar year)
+
+expolsec1 – Equals 1 if the challenger state is facing an external political threat
+	
+ps3dominsec1 – Equals 1 if the challenger and target have the same regime type (affinitj=1) and the challenger is facing a domestic political threat (dominsec1=1)
+
+ps3expolsec1 – Equals 1 if the challenger and target have the same regime type (affinitj=1) and the challenger is facing a external political threat (expolsec1=1)
+
+ps4ex1 – Equals 1 if the challenger and target have different regime types (affinitj=0), the challenger is facing an external political threat (expolse1c=1) and the country constituting the external threat has the same regime type as the target state (as classified by tdregtyp1 & 2 )
+
+milrat2 – Military balance between target and challenger, expressed as a percentage of the overall dyadic military capabilities held by the target (ranges from 0-1);  this variable is an average of the two sides’ ratios of military expenditures (expratio), troops (trpratio), and spending per troop (sptrprat).
+
+locad2 – (applies to MIDs only) Equals 1 if the target has an advantage in the local balance of forces
+
+odi2 – Is the target currently engaged in another military conflict (MID, territorial dispute MID, any type of war);  0 if no, 1 if yes
+
+strval2 – Strategic value of disputed territory to the target;  0 if no strategic value, 1 if strategic value
+
+ecoval2 – Economic value of disputed territory to the target;  0 if no economic value, 1 if economic value
+
+netdem2 – POLITY net-democracy score for target;  ranges from –10 (most non-democratic) to +10 (most democratic)
+
+dem2– Dummy variable to indicate that the target is democratic;  0 if netdem2 is less than +6, 1 if netdem2 is greater than or equal to +6
+
+ndem2 – Dummy variable to indicate that the target is non-democratic;  0 if netdem2 is greater than or equal to +6, 1 if netdem2 is less than +6
+
+erv5netdem2– An interaction term generated by multiplying endriv5j * netdem2
+
+erv10netdem2– An interaction term generated by multiplying endrv10j * netdem2
+
+erv5dem2– An interaction term equal to 1 if endriv5j=1 and dem2=1
+
+erv10dm2 – An interaction term equal to 1 if endrv10j=1 and dem2=1
+
+stalea2 – Equals 1 if the target suffered a stalemate in the previous round of talks with the challenger and that round of talks took place within the past twelve months;  from the target’s point of view, a “stalemate” is when the target made no or limited concessions (dvneg2 in the previous talks was 0 or 1), while the challenger made no concessions (dvneg1 in the previous talks was 0) 
+	
+staleb2 – Equals 1 if the target suffered a stalemate in the previous round of talks with the challenger and that round of talks took place within the past twenty-four months;  from the target’s point of view, a “stalemate” is when the target made no or limited concessions (dvneg2 in the previous talks was 0 or 1), while the challenger made no concessions (dvneg1 in the previous talks was 0) 
+
+stalec2 – Equals 1 if the target suffered a stalemate in the previous round of talks with the challenger and that round of talks took place within the past sixty months;  from the target’s point of view, a “stalemate” is when the target made no or limited concessions (dvneg2 in the previous talks was 0 or 1), while the challenger made no concessions (dvneg1 in the previous talks was 0) 
+
+netdem1stale2 – An interaction term generated by multiplying netdem2 * stalea2
+
+netdem2stale2 – An interaction term generated by multiplying netdem2 * staleb2
+
+netdem5stale2 – An interaction term generated by multiplying netdem2 * stalec2 
+
+ethval2 – Does the target have ethnic co-nationals located in the disputed territory?  0 if no, 1 if yes
+
+netdemethval2 – An interaction term generated by multiplying ethval2 * netdem2
+
+ethvdem2– An interaction term generated by multiplying ethval2 * dem2
+
+mil46unc2 – Indicates a situation of relative military parity between the target and challenger (milrat2 is between .4 and .6)
+
+netdemmilunc2 – An interaction term generated by multiplying netdem2* mil46unc2
+
+allupp2 – The % of seats held by the governing coalition in the upper house of bicameral target states (this variable only applies to democratic targets, i.e., dem2=1); in states where the lower house has effective legislative power, the value for allow2 is used for allupp2
+
+alllow2 – The % of seats held by the governing coalition in the lower house of the target state (this variable only applies to democratic targets, i.e., dem2=1) 
+leadup2 – The % of seats held by the largest/primary governing party in the upper house of bicameral target states (this variable only applies to democratic targets, i.e., dem2=1); in states where the lower house has effective legislative power, the value for allow2 is used for allupp2
+
+leadlow2 - The % of seats held by the largest/primary governing party in the lower house of the target state (this variable only applies to democratic targets, i.e., dem2=1)
+
+nparty2 - The number of parties in the governing coalition in the target state (this variable only applies to democratic targets, i.e., dem2=1) 
+
+mingovc2 – Equals 1 if the governing coalition in the target state has a minority of seats (allow2<50) in the legislature (this variable only applies to democratic targets, i.e., dem2=1) 
+
+mingovp2 – Equals 1 if the largest/primary party in the target state holds a minority of seats (leadlow2<50) in the legislature (this variable only applies to democratic targets, i.e., dem2=1)
+
+majgovc2 – Equals 1 if the governing coalition in the target state has a majority of seats (allow2>50) in the legislature (this variable only applies to democratic targets, i.e., dem2=1)
+
+majgovp2 – Equals 1 if the largest/primary party in the target state holds a majority of seats (leadlow2>50) in the legislature (this variable only applies to democratic targets, i.e., dem2=1)
+
+elecnt2 – The number of months since the last general election was held in the target state (this variable only applies to democratic targets, i.e., dem2=1)
+
+ele12m2 – Equals 1 if a general election has been held in the target state in the past twelve months (elecnt2<=12); also note that this variable only applies to democratic targets, i.e., dem2=1
+
+_3intgt2 – Equals 1 if the (democratic) leader of a target state is in a close race within 3 months of a general election (this variable only applies to democratic targets, i.e., dem2=1) 
+
+_6intgt2 – Equals 1 if the (democratic) leader of a target state is in a close race within 6 months of a general election (this variable only applies to democratic targets, i.e., dem2=1) 
+
+ndneg2 - Equals 1 if the (non-democratic) target state is significantly non-democratic; that is, if netdem2 is less than or equal to 0;  (this variable only applies to non-democratic targets, i.e., dem2=0)
+
+vndneg2 - Equals 1 if the (non-democratic) target state is very non-democratic; that is, if netdem2 is less than or equal to -5; (this variable only applies to non-democratic targets, i.e., dem2=0)
+
+ncou1yr2 –  Equals 1 if the (non-democratic) target state has not experienced a coup within the past twelve months (this variable only applies to non-democratic targets, i.e., dem2=0)
+
+ncou2yr2 – Equals 1 if the (non-democratic) target state has not experienced a coup within the past twenty-four months (this variable only applies to non-democratic targets, i.e., dem2=0)
+
+nvrebyr2 – Equals 1 if the (non-democratic) target state has not experienced some form of violent political rebellion (vrebyr2=0) in the past calendar year (this variable only applies to non-democratic targets, i.e., dem2=0)
+
+chnd_td2 – Equals 1 if the target is the non-democratic state in a mixed dyad;  that is, if dem2=0 and dem1=1
+
+nviol20lag2 - Number of the past twenty years in which the target state has NOT experienced violent political conflict; that is, the number of the past twenty years in which nvrebyr2=1
+
+nviodem2- Equals 1 if the target is democratic according to the lagged, violence-based measure of democratic norms (nviol20lag2 is 16 or higher)
+
+_20dmlg2 – Number of the past twenty years the target state has been democratic (in which netdem2>=6)
+
+pnvdem2– Equals 1 if the target is democratic according to the lagged, Polity-based measure of democratic norms (_20dmlag2 is 15 or higher)
+
+nv20stlyr2 - An interaction term generated by multiplying the lagged, violence-based measure of democratic norms (nviol20lag2) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 12 months (stalea2)
+
+nv20st2yr2 - An interaction term generated by multiplying the lagged, violence-based measure of democratic norms (nviol20lag2) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 24 months (staleb2)
+
+nv20st5yr2 - An interaction term generated by multiplying the lagged, violence-based measure of democratic norms (nviol20lag2) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 60 months (stalec2)
+
+nv20milad2 - Equals nviol20lag2 if milrat2 > .6666
+
+nv20milmj2 - Equals nviol20lag2 if milrat2 > .5
+
+st1dmlg2 - An interaction term generated by multiplying the lagged, Polity-based measure of democratic norms (_20dmlag2) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 12 months (stalea2)
+
+st2dmlg2 - An interaction term generated by multiplying the lagged, Polity-based measure of democratic norms (_20dmlag2) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 24 months (staleb2)
+
+st5dmlg2 - An interaction term generated by multiplying the lagged, Polity-based measure of democratic norms (_20dmlag2) times a dummy variable to indicate the presence of a stalemate in negotiations within the past 60 months (stalec2)
+
+pnormad2 - Equals _20dmlag2 if milrat2 > .6666
+
+pnormmj2 - Equals _20dmlag2 if milrat2 > .5
+
+dem2yr2 – Equals 1 if the target state is currently democratic (dem2=1) and has recently become democratic (netdem2 became greater than or equal to 6) within the current calendar year or the previous two calendar years
+
+dem5yr2 – Equals 1 if the target state is currently democratic (dem2=1) and has recently become democratic (netdem2 became greater than or equal to 6) within the current calendar year or the previous five calendar years
+
+dem10yr2 – Equals 1 if the target state is currently democratic (dem2=1) and has recently become democratic (netdem2 became greater than or equal to 6) within the current calendar year or the previous ten calendar years
+
+yrsvnd2 – The number of the past twenty years in which the target has been very non-democratic;  that is, its Polity net-democracy score was –5 or less
+
+pn4_10v2 – Equals 1 if the target state is considered non-democratic according to the lagged, violence-based measure of democratic norms (nviodem2=1) and if the target was free from internal violence for 10 or fewer years during the past twenty years (i.e., if nviol20lag2<=10)
+
+g10viol2 – Equals 1 if the target state is considered non-democratic according to the lagged, violence-based measure of democratic norms (nviodem2=1) and if the target experienced significant internal violence during the past twenty years (i.e., if nviol20lag2<10, which means the target experienced internal violence in at least 10 of the past 20 years)
+
+g15viol2 – Equals 1 if the target state is considered non-democratic according to the lagged, violence-based measure of democratic norms (nviodem2=1) and if the target experienced very high levels of internal violence during the past twenty years (i.e., if nviol20lag2<5, which means the target experienced internal violence in at least 15 of the past 20 years)
+
+ndnormmix2 – Equals 1 if the target is the nondemocratic state in a mixed dyad according to the lagged violence measure (noutmixdyad=1 and nviodem2=0)
+
+mixdypolnondem2 - Equals 1 if the target is the nondemocratic state in a mixed dyad according to the lagged, Polity-based measure (mixdynpj=1 and pnvdem2=0)
+
+tdrgtyp2 – The regime type of the target state, based on the following classifications: 1 if democracy (netdem2>= 6), 2 if hereditary non-democratic monarchy, 3 if collective rule by military junta, 4 if single-party-dominant communist state, 5 if single-party-dominant fascist state; 9 if other
+
+dominsec2 - Equals 1 if the regime in the target state is facing a domestic political threat (current civil war or revolution; insurgency, coup, or attempted coup within the past calendar year)
+
+expolsec2 – Equals 1 if the target state is facing an external political threat
+	
+ps3dominsec2 – Equals 1 if the target and challenger have the same regime type (affinitj=1) and the target is facing a domestic political threat (dominsec2=1)
+
+ps3expolsec2 – Equals 1 if the target and challenger have the same regime type (affinitj=1) and the target is facing a external political threat (expolsec2=1)
+
+ps4ex2 – Equals 1 if the target and challenger have different regime types (affinitj=0), the target is facing an external political threat (expolsec2=1) and the country constituting the external threat has the same regime type as the challenger state (as classified by tdregtyp1)
+
+	
+
+Variables carried over from the Status Quo data set 
+
+• The next several dozen variables that you see in the Outcome data set are variables that were originally in the Status Quo data set.  They are included in the Outcome data set in order to facilitate the estimation of a Heckman-type selection model (or similar strategic estimator), using either dvsqngbi as the “selection” dependent variable (when attempting to explain the level of concessions in rounds of negotiations) or dvsqesbi as the “selection” dependent variable (when attempting to explain MID escalation). See the codebook for the Status Quo data set for more details. 
+
+
+
+
+
+
+
+
+
+PAGE  
+
+
+PAGE  1
+
+
+
+
